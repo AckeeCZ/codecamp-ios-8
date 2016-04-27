@@ -45,6 +45,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         }
     }
 
+    // MARK: Location delegate
+
     func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
         if status == .AuthorizedWhenInUse || status == .AuthorizedAlways {
             mapView.showsUserLocation = true
@@ -60,6 +62,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         let lastLocation = locations.last! // we are sure we have at least one location there
         print(lastLocation)
     }
+
+    // MARK: MapView delegate
+
+    let reuseIdentifier = "myAnnotationView"
+
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+
+        let annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdentifier) ?? MKAnnotationView(annotation: annotation, reuseIdentifier: reuseIdentifier)
+
+        annotationView.image = UIImage(named: "pin")
+
+        return annotationView
+    }
+
+    // MARK: Other
 
     let locations = [
         ["lat": 50.10155117, "lon": 14.50131164],
