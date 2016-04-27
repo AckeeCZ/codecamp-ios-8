@@ -69,9 +69,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
 
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
 
-        let annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdentifier) ?? MKAnnotationView(annotation: annotation, reuseIdentifier: reuseIdentifier)
+        // we want default blue mark for user's location
+        if annotation is MKUserLocation {
+            return nil
+        }
 
+        // dequeue annotation view or create new one
+        let annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdentifier) ?? MKAnnotationView(annotation: annotation, reuseIdentifier: reuseIdentifier)
         annotationView.image = UIImage(named: "pin")
+        annotationView.canShowCallout = true
+
+        let button = UIButton(type: .DetailDisclosure) // we could add target-action and create some interaction
+        annotationView.rightCalloutAccessoryView = button
+
+        let label = UILabel()
+        label.text = "Detail label"
+        label.font = UIFont.systemFontOfSize(10)
+        annotationView.detailCalloutAccessoryView = label
+
+        annotationView.draggable = true // that's nonsense here of course 😏 - just for example
 
         return annotationView
     }
