@@ -20,7 +20,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         super.viewDidLoad()
 
         locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestWhenInUseAuthorization() // nice pod for requesting permissions - https://github.com/nickoneill/PermissionScope
 
         let mapView = MKMapView()
         view.addSubview(mapView)
@@ -34,8 +34,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         if status == .AuthorizedWhenInUse || status == .AuthorizedAlways {
             mapView.showsUserLocation = true
             mapView.userTrackingMode = .Follow
+
+            locationManager.startUpdatingLocation() // we should also stop it somewhere!
         } else {
             print("Alert - Hey user! Go to settings and give me permissions!")
         }
+    }
+
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let lastLocation = locations.last! // we are sure we have at least one location there
+        print(lastLocation)
     }
 }
