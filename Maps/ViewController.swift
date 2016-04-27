@@ -16,6 +16,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
 
     let locationManager = CLLocationManager()
 
+    let geocoder = CLGeocoder()
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -60,7 +62,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
 
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let lastLocation = locations.last! // we are sure we have at least one location there
-        print(lastLocation)
+
+        geocoder.reverseGeocodeLocation(lastLocation) { [weak self](placemarks, error) in
+            guard let placemark = placemarks?.last, street = placemark.thoroughfare, city = placemark.locality else {
+                self?.navigationItem.title = "Address not found"
+                return
+            }
+
+            self?.navigationItem.title = "\(city), \(street)"
+        }
     }
 
     // MARK: MapView delegate
