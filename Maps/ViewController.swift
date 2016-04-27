@@ -8,8 +8,9 @@
 
 import UIKit
 import MapKit
+import CoreLocation
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CLLocationManagerDelegate {
 
     weak var mapView: MKMapView!
 
@@ -18,15 +19,23 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
 
         let mapView = MKMapView()
-        mapView.showsUserLocation = true
-        mapView.userTrackingMode = MKUserTrackingMode.Follow
         view.addSubview(mapView)
         mapView.snp_makeConstraints { make in
             make.edges.equalTo(0)
         }
         self.mapView = mapView
+    }
+
+    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        if status == .AuthorizedWhenInUse || status == .AuthorizedAlways {
+            mapView.showsUserLocation = true
+            mapView.userTrackingMode = .Follow
+        } else {
+            print("Alert - Hey user! Go to settings and give me permissions!")
+        }
     }
 }
