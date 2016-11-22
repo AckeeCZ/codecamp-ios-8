@@ -32,6 +32,34 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         }
         self.mapView = mapView
 
+        let sourceCoordinates = CLLocationCoordinate2D(latitude: 50.10155117, longitude: 14.50131164)
+        let targetCoordinates = CLLocationCoordinate2D(latitude: 50.04845155, longitude: 14.40643163)
+        
+        let request = MKDirectionsRequest()
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: sourceCoordinates, addressDictionary: nil))
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: targetCoordinates, addressDictionary: nil))
+        request.requestsAlternateRoutes = false
+        request.transportType = .Automobile
+        MKDirections(request: request).calculateDirectionsWithCompletionHandler { response, error in
+            if let routes = response?.routes where routes.count > 0 {
+                let route = routes[0]
+                
+                mapView.addOverlay(route.polyline)
+                
+                if mapView.overlays.count == 1 {
+                    mapView.setVisibleMapRect(route.polyline.boundingMapRect, edgePadding: UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0), animated: false)
+                } else {
+                    let polylineBoundingRect =  MKMapRectUnion(mapView.visibleMapRect, route.polyline.boundingMapRect)
+                    mapView.setVisibleMapRect(polylineBoundingRect, edgePadding: UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0), animated: false)
+                }
+                
+            } else if let error = error {
+                print(error)
+            } else {
+                print("Oops, something's wrong")
+            }
+        }
+        
         updateAnnotaions()
     }
 
@@ -100,6 +128,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         annotationView.draggable = true // that's nonsense here of course 😏 - just for example
 
         return annotationView
+    }
+
+    func mapView(mapView: MKMapView, rendererForOverlay overlay: MKOverlay) -> MKOverlayRenderer {
+        let polylineRenderer = MKPolylineRenderer(overlay: overlay)
+        if (overlay is MKPolyline) {
+            polylineRenderer.strokeColor = UIColor.blueColor().colorWithAlphaComponent(0.75)
+            polylineRenderer.lineWidth = 5
+        }
+        return polylineRenderer
     }
 
     // MARK: Other
